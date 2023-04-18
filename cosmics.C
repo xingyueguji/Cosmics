@@ -1,6 +1,6 @@
 #include <cmath>
 
-void cosmics( Int_t nrun=1310, Int_t nevent=0, Int_t replay = 1, Int_t fullreplay = 1) {
+void cosmics( Int_t nrun=1310, Int_t nevent=0, Int_t replay = 20000, Int_t fullreplay = -1) {
     
     gStyle->SetOptTitle(0);
     // --------------------------------------------------------------------------------
@@ -37,12 +37,14 @@ void cosmics( Int_t nrun=1310, Int_t nevent=0, Int_t replay = 1, Int_t fullrepla
     TH2F *mappingInt = new TH2F("mappingInt","Integral Mean",30,0,30,36,0,36);
     TH2F *mappingPed = new TH2F("mappingPed","Ped Mean",30,0,30,36,0,36);
     TH2F *mappingPulsetime = new TH2F("mappingPulsetime","Pulse Time mean",30,0,30,36,0,36);
+    TH1D *SingleAmp = new TH1D("SingleAmp","SingleAmp",200,-10,50);
     
     TCanvas *test = new TCanvas("test","test",800,800);
     TCanvas *Ampmean = new TCanvas("Ampmean","Amp",3200,3200);
     TCanvas *Intmean = new TCanvas("Intmean","integral",1600,1600);
     TCanvas *Pedmean = new TCanvas("Pedmean","Pedestal",1600,1600);
     TCanvas *Pulsetimemean = new TCanvas("Pulsetimemean","Pulse time",1600,1600);
+    TCanvas *SingleAmpCan = new TCanvas("SingleAmpCan","single block amp",800,800);
     Int_t nPMT;
     Int_t location;
     Int_t NSamp;
@@ -124,14 +126,21 @@ void cosmics( Int_t nrun=1310, Int_t nevent=0, Int_t replay = 1, Int_t fullrepla
         fullreplay1 = replay;
     }
     
+    int nblock = 371; // testing Amp value;
+    double totalamp = 0;
     for(Int_t i=0; i<fullreplay1; i++){
         t->GetEntry(i);
         for (Int_t a=0; a<200; a++){
             if (int(adcCounter[a]) == 0 && a > 0){
                 break;
             }
+            if (adcCounter[a] == 371){
+                SingleAmp->Fill(Amp[a]);
+                totalamp += Amp[a];
+            }
             counter = int(adcCounter[a]);
             TotAmp[counter] += Amp[a];
+            
             //TotIntegral[counter] += Int[a];
             //TotPulseTime[counter] += Pulsetime[a];
             //TotPedestal[counter] += Ped[a];
@@ -143,7 +152,7 @@ void cosmics( Int_t nrun=1310, Int_t nevent=0, Int_t replay = 1, Int_t fullrepla
         
     }
     
-    for(Int_t i=0; i<1080; i++){
+    /*for(Int_t i=0; i<1080; i++){
         MeanAmp[i] = TotAmp[i]/ nentries;
         //MeanIntegral[i] = TotIntegral[i]/ nentries;
         //MeanPulseTime[i] = TotPulseTime[i]/ nentries;
@@ -154,41 +163,25 @@ void cosmics( Int_t nrun=1310, Int_t nevent=0, Int_t replay = 1, Int_t fullrepla
     for(Int_t i=0; i<1080; i++){
         cout << MeanAmp[i] << endl;
         mappingAmp->SetBinContent(30 - i % 30 , i/30 + 1, MeanAmp[i]);
-    }
+    }*/
+    cout << totalamp << endl;
+    cout << totalamp / nentries << endl;
+    SingleAmpCan->Divide(1,1);
+    SingleAmpCan->cd(1);
+    SingleAmp->Draw();
+    SingleAmpCan->SaveAs("~/NPS/SingleblockAmp.pdf");
     
     
     
-    Ampmean->cd();
+    
+    
+    /*Ampmean->cd();
     gPad->SetGrid(1,1);
     mappingAmp->SetMarkerColor(kBlack);
     mappingAmp->SetLabelSize(0.01,"Z");
     mappingAmp->Draw("colztext");
-    Ampmean->SaveAs("~/NPS/test233.pdf");
+    Ampmean->SaveAs("~/NPS/test233.pdf");*/
     
-    
-    
-    
-    
-    
-    //-------------------------------------------------------------------------------------
-    /*test->cd();
-    Int_t xaxisposition;
-    Int_t yaxisposition;
-    Double_t abc = 0;
-    for (int b = 0; b < 36; b++){
-        if(adcCounter[b] == abc){
-            break;
-        }
-        xaxisposition = 30 - int(adcCounter[b]) % 30 - 1;
-        yaxisposition = int(adcCounter[b]) / 30;
-        cout << "adcCounter is"<<adcCounter[b]<<endl;
-        cout << xaxisposition << " x " << yaxisposition << " y " << endl;
-        mapping->SetBinContent(xaxisposition+1,yaxisposition+1,TimingArray[b]);
-        cout << TimingArray[b] << "Mean is " << endl;
-    }
-    mapping->SetMarkerColor(kBlack);
-    mapping->Draw("colztext");
-    test->SaveAs("~/NPS/test123.pdf");*/
     
     
 }
