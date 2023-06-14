@@ -1,0 +1,58 @@
+#include <cmath>
+
+void NEWPLOTS( Int_t nrun=1370) {
+    // if full replay : fullreplay = 1;
+    // if single event: nevent = event number, replay = 1, fullreplay != 1;
+    // if 20k replay: replay = 20k, fullreplay != 1;
+    gStyle->SetOptFit(3);
+    // --------------------------------------------------------------------------------
+    
+    TFile *f = new TFile(Form("nps_eel108_%d.root", nrun));
+    TTree *t = (TTree*) f->Get("T");
+    
+    // Branch declaration -------------------------------------------------------------
+    
+    Int_t NSampWaveForm;
+    t->SetBranchAddress("Ndata.NPS.cal.fly.adcSampWaveform",&NSampWaveForm);
+    Double_t SampWaveForm[300000];
+    t->SetBranchAddress("NPS.cal.fly.adcSampWaveform",&SampWaveForm);
+    Int_t NadcCounter;
+    t->SetBranchAddress("Ndata.NPS.cal.fly.adcCounter",&NadcCounter);
+    Double_t adcCounter[2000];
+    t->SetBranchAddress("NPS.cal.fly.adcCounter",&adcCounter);
+    Double_t Pulsetime[2000];
+    t->SetBranchAddress("NPS.cal.fly.adcSampPulseTime",&Pulsetime);
+    
+    //Histogram------------------------------------------------------------------------
+    TH1D *TotalHit = new TH1D("TotalHit","TotalHit_Above_4mV",100,0,100);
+    TH2D *TimeBlock = new TH2D("TimeBlock","Time_vs_Block",400,0,400,100,0,400);
+    TH2D *TimeBlock_Zoom = new TH2D("TimeBlock_Zoom","Time_vs_Block",400,0,400,10,180,220);
+    cout << "abc" << endl;
+
+
+
+
+    //Filling Histogram
+    Long64_t nentries = t->GetEntries();
+    cout <<"Total Event Number is "<< nentries << endl;
+    for(Int_t i=0; i<nentries; i++){
+        t->GetEntry(i);
+        for(Int_t j=0; j<NadcCounter; j++){
+            TimeBlock->Fill(adcCounter[j]+1, Pulsetime[j]);
+            TimeBlock_Zoom->Fill(adcCounter[j]+1, Pulsetime[j]);
+        }
+    }
+
+    //Draw
+
+    TCanvas *TimevsBlock = new TCanvas("TimevsBlock","",1600,1600);
+    TimevsBlock->cd();
+    TimeBlock->Draw("colz");
+    TimevsBlock->SaveAs(Form("Time_vs_Block_%i.pdf",nrun));
+
+    TimevsBlock->Clear();
+    TimevsBlock->cd();
+    TimeBlock_Zoom->Draw("colz");
+    TimevsBlock->SaveAs(Form("Time_vs_Block_Zoom_%i.pdf",nrun));
+
+}
