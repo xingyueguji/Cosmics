@@ -25,8 +25,9 @@ void NEWPLOTS( Int_t nrun=1370) {
     
     //Histogram------------------------------------------------------------------------
     TH1D *TotalHit = new TH1D("TotalHit","TotalHit_Above_4mV",100,0,100);
-    TH2D *TimeBlock = new TH2D("TimeBlock","Time_vs_Block",400,0,400,100,0,400);
-    TH2D *TimeBlock_Zoom = new TH2D("TimeBlock_Zoom","Time_vs_Block",400,0,400,10,180,220);
+    TH2D *TimeBlock = new TH2D("TimeBlock","Time_vs_Block",120,0,120,100,0,400);
+    TH2D *TimeBlock_Zoom = new TH2D("TimeBlock_Zoom","Time_vs_Block",120,0,120,10,100,140);
+    TH1D *TotalGoodHit = new TH1D("TotalGoodHit","Good Hit",100,0,100);
     cout << "abc" << endl;
 
 
@@ -34,13 +35,20 @@ void NEWPLOTS( Int_t nrun=1370) {
 
     //Filling Histogram
     Long64_t nentries = t->GetEntries();
+    Int_t counterofgoodhit = 0;
     cout <<"Total Event Number is "<< nentries << endl;
     for(Int_t i=0; i<nentries; i++){
         t->GetEntry(i);
+        TotalHit->Fill(NadcCounter); // For now, just use the # of elements in adccounter to count the hit, if multiple pulses, then need to add a loop here.
         for(Int_t j=0; j<NadcCounter; j++){
             TimeBlock->Fill(adcCounter[j]+1, Pulsetime[j]);
             TimeBlock_Zoom->Fill(adcCounter[j]+1, Pulsetime[j]);
+            if(Pulsetime[j]<= 130 or Pulsetime[j]>= 110){
+                counterofgoodhit += 1;
+            }
         }
+        TotalGoodHit->Fill(counterofgoodhit);
+        counterofgoodhit = 0;
     }
 
     //Draw
@@ -54,5 +62,15 @@ void NEWPLOTS( Int_t nrun=1370) {
     TimevsBlock->cd();
     TimeBlock_Zoom->Draw("colz");
     TimevsBlock->SaveAs(Form("Time_vs_Block_Zoom_%i.pdf",nrun));
+
+    TCanvas *TotHits = new TCanvas("TotHits","",1600,1600);
+    TotHits->cd();
+    TotalHit->Draw();
+    TotHits->SaveAs(Form("Total_Hits_%i.pdf",nrun));
+
+    TotHits->Clear();
+    TotHits->cd();
+    TotalGoodHit->Draw();
+    TotalGoodHit->SaveAs(Form("Total_Good_Hits_%i.pdf",nrun));
 
 }
