@@ -110,7 +110,7 @@ void NEWPLOTS( Int_t nrun=55) {
     NumPulse->SaveAs(Form("#Pulse_vs_PMT_%i.pdf",nrun));
     NumPulse->Clear();
     NumPulse->cd();
-    GoodPulsenumber->Draw("colz");
+    GoodPulseBlock->Draw("colz");
     NumPulse->SaveAs(Form("GOOD#Pulse_vs_PMT_%i.pdf",nrun));
 
 
