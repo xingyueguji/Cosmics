@@ -32,14 +32,16 @@ void NEWPLOTS( Int_t nrun=55) {
     TH1D *TotalGoodHit = new TH1D("TotalGoodHit","Good Hit",100,0,100);
     TH1D *GoodHitPerBlock = new TH1D("GoodHitPerBlock","GoodHitPerBlock",120,0,120);
     TH2D *AmpBlock = new TH2D("AmpBlock","Amp_vs_Block",120,0,120,30,0,30);
+    TH2D *PulseBlock = new TH2D("PulseBlock","#_of_Pulses_vs_PMT",120,0,120,10,0,10); // 120 can be changed to total pmt number, now using 120 to test it.
     cout << "abc" << endl;
 
-
-
+    //Arrays
+    Int_t Pulsenumber[120] = {}; // can change 120 to 36*30
 
     //Filling Histogram
     Long64_t nentries = t->GetEntries();
     Int_t counterofgoodhit = 0;
+
     cout <<"Total Event Number is "<< nentries << endl;
     for(Int_t i=0; i<nentries; i++){
         t->GetEntry(i);
@@ -48,18 +50,25 @@ void NEWPLOTS( Int_t nrun=55) {
             TimeBlock->Fill(adcCounter[j]+1, Pulsetime[j]);
             TimeBlock_Zoom->Fill(adcCounter[j]+1, Pulsetime[j]);
             AmpBlock->Fill(adcCounter[j]+1,Amp[j]);
+            Pulsenumber[adcCounter[j]] += 1;
             if(Pulsetime[j]<= 130 or Pulsetime[j]>= 110){
                 counterofgoodhit += 1;
                 GoodHitPerBlock->Fill(adcCounter[j]+1);
             }
         }
+        for(Int_t k=0; k<120; k++){
+        PulseBlock->Fill(k+1,Pulsenumber[k]+1);
+        }
+
         TotalGoodHit->Fill(counterofgoodhit);
         counterofgoodhit = 0;
     }
 
+    
+
     //Draw
 
-    TCanvas *TimevsBlock = new TCanvas("TimevsBlock","",1600,1600);
+    TCanvas *TimevsBlock = new TCanvas("TimevsBlock","",800,800);
     TimevsBlock->cd();
     TimeBlock->Draw("colz");
     TimevsBlock->SaveAs(Form("Time_vs_Block_%i.pdf",nrun));
@@ -69,7 +78,7 @@ void NEWPLOTS( Int_t nrun=55) {
     TimeBlock_Zoom->Draw("colz");
     TimevsBlock->SaveAs(Form("Time_vs_Block_Zoom_%i.pdf",nrun));
 
-    TCanvas *TotHits = new TCanvas("TotHits","",1600,1600);
+    TCanvas *TotHits = new TCanvas("TotHits","",800,800);
     TotHits->cd();
     TotalHit->Draw();
     TotHits->SaveAs(Form("Total_Hits_%i.pdf",nrun));
@@ -84,9 +93,15 @@ void NEWPLOTS( Int_t nrun=55) {
     GoodHitPerBlock->Draw();
     TotHits->SaveAs(Form("Total_Good_Hits_Per_Block_%i.pdf",nrun));
 
-    TCanvas *Amp = new TCanvas("Amp","",1600,1600);
+    TCanvas *Amp = new TCanvas("Amp","",800,800);
     Amp->cd();
     AmpBlock->Draw("colz");
     Amp->SaveAs(Form("Amp_VS_Block_%i.pdf",nrun));
+
+    TCanvas *NumPulse = new TCanvas("NumPulse","#_of_Pulses_PMT_number",800,800);
+    NumPulse->cd();
+    PulseBlock->Draw("colz");
+    NumPulse->SaveAs(Form("#Pulse_vs_PMT_%i.pdf",nrun));
+
 
 }
