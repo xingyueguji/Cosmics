@@ -54,7 +54,7 @@ void NEWPLOTS( Int_t nrun=55) {
             AmpBlock->Fill(adcCounter[j]+1,Amp[j]);
             Pulsenumber[Int_t(adcCounter[j])] += 1;
 
-            if(Pulsetime[j]<= 130 or Pulsetime[j]>= 110){
+            if(Pulsetime[j]<= 122 and Pulsetime[j]>= 102){
                 counterofgoodhit += 1;
                 GoodHitPerBlock->Fill(adcCounter[j]+1);
                 GoodPulsenumber[Int_t(adcCounter[j])] += 1;
