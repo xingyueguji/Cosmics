@@ -53,10 +53,13 @@ void NEWPLOTS( Int_t nrun=55) {
             TimeBlock_Zoom->Fill(adcCounter[j]+1, Pulsetime[j]);
             AmpBlock->Fill(adcCounter[j]+1,Amp[j]);
             Pulsenumber[Int_t(adcCounter[j])] += 1;
+
             if(Pulsetime[j]<= 130 or Pulsetime[j]>= 110){
                 counterofgoodhit += 1;
                 GoodHitPerBlock->Fill(adcCounter[j]+1);
                 GoodPulsenumber[Int_t(adcCounter[j])] += 1;
+                cout << "Pulsetime for "<< adcCounter[j] << "is " <<Pulsetime[j] << endl;
+                cout << "Counterofgoodhit is "<< counterofgoodhit << endl;
             }
         }
         for(Int_t k=0; k<120; k++){
