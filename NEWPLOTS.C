@@ -33,10 +33,12 @@ void NEWPLOTS( Int_t nrun=55) {
     TH1D *GoodHitPerBlock = new TH1D("GoodHitPerBlock","GoodHitPerBlock",120,0,120);
     TH2D *AmpBlock = new TH2D("AmpBlock","Amp_vs_Block",120,0,120,30,0,30);
     TH2D *PulseBlock = new TH2D("PulseBlock","#_of_Pulses_vs_PMT",300,0,300,10,0,10); // 300 can be changed to total pmt number, now using 300 to test it.
+    TH2D *GoodPulseBlock = new TH2D("GoodPulseBlock","#_of_GOOD_Pulses_vs_PMT",300,0,300,10,0,10);
     cout << "abc" << endl;
 
     //Arrays
     Int_t Pulsenumber[300] = {}; // can change 120 to 36*30
+    Int_t GoodPulsenumber[300] = {};
 
     //Filling Histogram
     Long64_t nentries = t->GetEntries();
@@ -54,10 +56,12 @@ void NEWPLOTS( Int_t nrun=55) {
             if(Pulsetime[j]<= 130 or Pulsetime[j]>= 110){
                 counterofgoodhit += 1;
                 GoodHitPerBlock->Fill(adcCounter[j]+1);
+                GoodPulsenumber[Int_t(adcCounter[j])] += 1;
             }
         }
         for(Int_t k=0; k<120; k++){
         PulseBlock->Fill(k+1,Pulsenumber[k]+1);
+        GoodPulseBlock->Fill(k+1,GoodPulsenumber[k]+1);
         }
         TotalGoodHit->Fill(counterofgoodhit);
         counterofgoodhit = 0;
@@ -104,6 +108,10 @@ void NEWPLOTS( Int_t nrun=55) {
     NumPulse->cd();
     PulseBlock->Draw("colz");
     NumPulse->SaveAs(Form("#Pulse_vs_PMT_%i.pdf",nrun));
+    NumPulse->Clear();
+    NumPulse->cd();
+    GoodPulsenumber->Draw("colz");
+    NumPulse->SaveAs(Form("GOOD#Pulse_vs_PMT_%i.pdf",nrun));
 
 
 }
