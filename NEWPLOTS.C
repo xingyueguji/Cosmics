@@ -32,11 +32,11 @@ void NEWPLOTS( Int_t nrun=55) {
     TH1D *TotalGoodHit = new TH1D("TotalGoodHit","Good Hit",100,0,100);
     TH1D *GoodHitPerBlock = new TH1D("GoodHitPerBlock","GoodHitPerBlock",120,0,120);
     TH2D *AmpBlock = new TH2D("AmpBlock","Amp_vs_Block",120,0,120,30,0,30);
-    TH2D *PulseBlock = new TH2D("PulseBlock","#_of_Pulses_vs_PMT",120,0,120,10,0,10); // 120 can be changed to total pmt number, now using 120 to test it.
+    TH2D *PulseBlock = new TH2D("PulseBlock","#_of_Pulses_vs_PMT",300,0,300,10,0,10); // 300 can be changed to total pmt number, now using 300 to test it.
     cout << "abc" << endl;
 
     //Arrays
-    Int_t Pulsenumber[120] = {}; // can change 120 to 36*30
+    Int_t Pulsenumber[300] = {}; // can change 120 to 36*30
 
     //Filling Histogram
     Long64_t nentries = t->GetEntries();
@@ -50,7 +50,7 @@ void NEWPLOTS( Int_t nrun=55) {
             TimeBlock->Fill(adcCounter[j]+1, Pulsetime[j]);
             TimeBlock_Zoom->Fill(adcCounter[j]+1, Pulsetime[j]);
             AmpBlock->Fill(adcCounter[j]+1,Amp[j]);
-            Pulsenumber[adcCounter[j]] += 1;
+            Pulsenumber[Int_t(adcCounter[j])] += 1;
             if(Pulsetime[j]<= 130 or Pulsetime[j]>= 110){
                 counterofgoodhit += 1;
                 GoodHitPerBlock->Fill(adcCounter[j]+1);
@@ -59,9 +59,11 @@ void NEWPLOTS( Int_t nrun=55) {
         for(Int_t k=0; k<120; k++){
         PulseBlock->Fill(k+1,Pulsenumber[k]+1);
         }
-
         TotalGoodHit->Fill(counterofgoodhit);
         counterofgoodhit = 0;
+        for(Int_t z=0;z<300;z++){
+            Pulsenumber[z] = 0;
+        }
     }
 
     
@@ -93,10 +95,10 @@ void NEWPLOTS( Int_t nrun=55) {
     GoodHitPerBlock->Draw();
     TotHits->SaveAs(Form("Total_Good_Hits_Per_Block_%i.pdf",nrun));
 
-    TCanvas *Amp = new TCanvas("Amp","",800,800);
-    Amp->cd();
+    TCanvas *C_Amp = new TCanvas("Amp","",800,800);
+    C_Amp->cd();
     AmpBlock->Draw("colz");
-    Amp->SaveAs(Form("Amp_VS_Block_%i.pdf",nrun));
+    C_Amp->SaveAs(Form("Amp_VS_Block_%i.pdf",nrun));
 
     TCanvas *NumPulse = new TCanvas("NumPulse","#_of_Pulses_PMT_number",800,800);
     NumPulse->cd();
