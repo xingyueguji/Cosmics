@@ -67,6 +67,7 @@ void NEWPLOTS( Int_t nrun=55) {
         counterofgoodhit = 0;
         for(Int_t z=0;z<300;z++){
             Pulsenumber[z] = 0;
+            GoodPulsenumber[z] = 0;
         }
     }
 
