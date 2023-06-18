@@ -74,6 +74,7 @@ void NEWPLOTS( Int_t nrun=55) {
         */
 
        for(Int_t n=0; n<300; n++){
+        cout << GoodPulsenumber[n] << endl;
             if(GoodPulsenumber[n] == 2){
                 cout <<  "Event number is " << i << "Block number is " << n << "Good Pulse number is " << GoodPulsenumber[n] << endl; 
                 break;
