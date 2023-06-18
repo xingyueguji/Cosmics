@@ -52,13 +52,13 @@ void NEWPLOTS( Int_t nrun=55) {
         TotalHit->Fill(NadcCounter); 
 
         for(Int_t j=0; j<NadcCounter; j++){
-            TimeBlock->Fill(adcCounter[j]+1, Pulsetime[j]);
-            TimeBlock_Zoom->Fill(adcCounter[j]+1, Pulsetime[j]);
-            AmpBlock->Fill(adcCounter[j]+1,Amp[j]);
+            TimeBlock->Fill(adcCounter[j], Pulsetime[j]);
+            TimeBlock_Zoom->Fill(adcCounter[j], Pulsetime[j]);
+            AmpBlock->Fill(adcCounter[j],Amp[j]);
             Pulsenumber[Int_t(adcCounter[j])] += 1;
             if(Pulsetime[j]<= 130 and Pulsetime[j]>= 110){
                 counterofgoodhit += 1;
-                GoodHitPerBlock->Fill(adcCounter[j]+1);
+                GoodHitPerBlock->Fill(adcCounter[j]);
                 GoodPulsenumber[Int_t(adcCounter[j])] += 1;
             }
         }
@@ -74,7 +74,6 @@ void NEWPLOTS( Int_t nrun=55) {
         */
 
        for(Int_t n=0; n<300; n++){
-        cout << GoodPulsenumber[n] << endl;
             if(GoodPulsenumber[n] == 2){
                 cout <<  "Event number is " << i << "Block number is " << n << "Good Pulse number is " << GoodPulsenumber[n] << endl; 
                 break;
@@ -82,8 +81,8 @@ void NEWPLOTS( Int_t nrun=55) {
         }
 
         for(Int_t k=0; k<120; k++){
-        PulseBlock->Fill(k+1,Pulsenumber[k]+1);
-        GoodPulseBlock->Fill(k+1,GoodPulsenumber[k]+1);
+        PulseBlock->Fill(k,Pulsenumber[k]);
+        GoodPulseBlock->Fill(k,GoodPulsenumber[k]);
         }
 
         TotalGoodHit->Fill(counterofgoodhit);
