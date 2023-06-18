@@ -72,6 +72,13 @@ void NEWPLOTS( Int_t nrun=55) {
         }
         */
 
+       for(Int_t n=0; n<300; n++){
+            if(GoodPulsenumber[n] == 2){
+                cout <<  "Event number is " << i << "Block number is " << n << "Good Pulse number is " << GoodPulsenumber[n] << endl; 
+                break;
+            }
+        }
+
         for(Int_t k=0; k<120; k++){
         PulseBlock->Fill(k+1,Pulsenumber[k]+1);
         GoodPulseBlock->Fill(k+1,GoodPulsenumber[k]+1);
@@ -102,6 +109,9 @@ void NEWPLOTS( Int_t nrun=55) {
             break;
         }
     }
+
+
+
 
     TCanvas *C_WaveForm = new TCanvas("C_WaveForm","Waveform",800,800);
     C_WaveForm->cd();
