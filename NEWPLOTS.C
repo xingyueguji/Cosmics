@@ -47,26 +47,38 @@ void NEWPLOTS( Int_t nrun=55) {
     cout <<"Total Event Number is "<< nentries << endl;
     for(Int_t i=0; i<nentries; i++){
         t->GetEntry(i);
-        TotalHit->Fill(NadcCounter); // For now, just use the # of elements in adccounter to count the hit, if multiple pulses, then need to add a loop here.
+        TotalHit->Fill(NadcCounter); 
+        
         for(Int_t j=0; j<NadcCounter; j++){
             TimeBlock->Fill(adcCounter[j]+1, Pulsetime[j]);
             TimeBlock_Zoom->Fill(adcCounter[j]+1, Pulsetime[j]);
             AmpBlock->Fill(adcCounter[j]+1,Amp[j]);
             Pulsenumber[Int_t(adcCounter[j])] += 1;
-
             if(Pulsetime[j]<= 130 or Pulsetime[j]>= 110){
                 counterofgoodhit += 1;
                 GoodHitPerBlock->Fill(adcCounter[j]+1);
                 GoodPulsenumber[Int_t(adcCounter[j])] += 1;
-                cout << "Pulsetime for "<< adcCounter[j] << "is " <<Pulsetime[j] << endl;
-                cout << "Counterofgoodhit is "<< counterofgoodhit << endl;
             }
         }
+
+
+        // Test WaveForm
+        for(Int_t n=0; n<300; n++){
+            if(Pulsenumber[n] == 4){
+                cout <<  "Event number is " << i << "Block number is " << n << "Pulse number is " << Pulsenumber[n] << endl; 
+                break;
+            }
+        }
+        //
+
         for(Int_t k=0; k<120; k++){
         PulseBlock->Fill(k+1,Pulsenumber[k]+1);
         GoodPulseBlock->Fill(k+1,GoodPulsenumber[k]+1);
         }
+
         TotalGoodHit->Fill(counterofgoodhit);
+
+
         counterofgoodhit = 0;
         for(Int_t z=0;z<300;z++){
             Pulsenumber[z] = 0;
