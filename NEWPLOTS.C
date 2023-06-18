@@ -116,7 +116,7 @@ void NEWPLOTS( Int_t nrun=55) {
             if(Int_t(SampWaveForm[i+1]!= 100)){
                 continue;
             }
-            cout << SampWaveFormp[i] << " " << SampWaveForm[i+1] << endl;
+            cout << SampWaveForm[i] << " " << SampWaveForm[i+1] << endl;
             for(Int_t j=0; j<100; j++){
                 f_GoodWaveForm->SetBinContent(j+1,SampWaveForm[i+2+j]);
             }
