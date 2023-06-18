@@ -88,18 +88,19 @@ void NEWPLOTS( Int_t nrun=55) {
     }
 
     //Get Waveform (see the comments below, only displaying 4 pulses event)
-    t->GetEntry(731);
+    t->GetEntry(2);
+    cout << SampWaveForm[4793] << SampWaveForm[4794] << endl;
     for(Int_t i =0; i<NSampWaveForm; i++){
-        if(Int_t(SampWaveForm[i]) == 87){
+        if(Int_t(SampWaveForm[i]) == 47){
             if(Int_t(SampWaveForm[i+1]!= 100)){
                 continue;
             }
+            for(Int_t j=0; j<100; j++){
+                f_WaveForm->SetBinContent(j+1,SampWaveForm[i+2+j]);
+            }
+            cout << i << endl;
+            break;
         }
-
-        for(Int_t j=0; j<100; j++){
-            f_WaveForm->SetBinContent(j+1,SampWaveForm[i+2+j]);
-        }
-        break;
     }
 
     TCanvas *C_WaveForm = new TCanvas("C_WaveForm","Waveform",800,800);
