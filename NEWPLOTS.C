@@ -7,7 +7,7 @@ void NEWPLOTS( Int_t nrun=55) {
     gStyle->SetOptFit(3);
     // --------------------------------------------------------------------------------
     
-    TFile *f = new TFile(Form("nps_eel108_%d.root", nrun));
+    TFile *f = new TFile(Form("../nps_eel108_%d.root", nrun));
     TTree *t = (TTree*) f->Get("T");
     
     // Branch declaration -------------------------------------------------------------
@@ -34,6 +34,7 @@ void NEWPLOTS( Int_t nrun=55) {
     TH2D *AmpBlock = new TH2D("AmpBlock","Amp_vs_Block",120,0,120,30,0,30);
     TH2D *PulseBlock = new TH2D("PulseBlock","#_of_Pulses_vs_PMT",300,0,300,10,0,10); // 300 can be changed to total pmt number, now using 300 to test it.
     TH2D *GoodPulseBlock = new TH2D("GoodPulseBlock","#_of_GOOD_Pulses_vs_PMT",300,0,300,10,0,10);
+    TH1D *f_WaveForm = new TH1D("f_WaveForm","Waveform_4P",100,0,400);
     cout << "abc" << endl;
 
     //Arrays
@@ -48,7 +49,7 @@ void NEWPLOTS( Int_t nrun=55) {
     for(Int_t i=0; i<nentries; i++){
         t->GetEntry(i);
         TotalHit->Fill(NadcCounter); 
-        
+
         for(Int_t j=0; j<NadcCounter; j++){
             TimeBlock->Fill(adcCounter[j]+1, Pulsetime[j]);
             TimeBlock_Zoom->Fill(adcCounter[j]+1, Pulsetime[j]);
@@ -62,14 +63,14 @@ void NEWPLOTS( Int_t nrun=55) {
         }
 
 
-        // Test WaveForm
+        /*Test WaveForm
         for(Int_t n=0; n<300; n++){
             if(Pulsenumber[n] == 4){
                 cout <<  "Event number is " << i << "Block number is " << n << "Pulse number is " << Pulsenumber[n] << endl; 
                 break;
             }
         }
-        //
+        */
 
         for(Int_t k=0; k<120; k++){
         PulseBlock->Fill(k+1,Pulsenumber[k]+1);
@@ -86,10 +87,32 @@ void NEWPLOTS( Int_t nrun=55) {
         }
     }
 
+    //Get Waveform (see the comments below, only displaying 4 pulses event)
+    t->GetEntry(731);
+    for(Int_t i =0; i<NSampWaveForm; i++){
+        if(Int(SampWaveForm[i]) == 87){
+            if(Int(SampWaveForm[i+1]!= 100)){
+                continue;
+            }
+        }
+
+        for(Int_t j=0; j<100; j++){
+            f_SampWaveForm->SetBinContent[j+1,SampWaveForm[i+2+j]];
+        }
+        break;
+    }
+
+    TCanvas *C_WaveForm = new TCanvas("C_WaveForm","Waveform",800,800);
+    C_WaveForm->cd();
+    f_SampWaveForm->Draw();
+    C_WaveForm->SaveAs(Form("../Waveform_%i.pdf",nrun));
+
+
+
     
 
     //Draw
-
+/*
     TCanvas *TimevsBlock = new TCanvas("TimevsBlock","",800,800);
     TimevsBlock->cd();
     TimeBlock->Draw("colz");
@@ -127,7 +150,55 @@ void NEWPLOTS( Int_t nrun=55) {
     NumPulse->Clear();
     NumPulse->cd();
     GoodPulseBlock->Draw("colz");
-    NumPulse->SaveAs(Form("GOOD#Pulse_vs_PMT_%i.pdf",nrun));
-
+    NumPulse->SaveAs(Form("GOOD#Pulse_vs_PMT_%i.pdf",nrun));*/
 
 }
+
+//For Run 55
+/*Event number is 2Block number is 47Pulse number is 4
+Event number is 45Block number is 63Pulse number is 4
+Event number is 47Block number is 8Pulse number is 4
+Event number is 55Block number is 0Pulse number is 4
+Event number is 68Block number is 27Pulse number is 4
+Event number is 76Block number is 18Pulse number is 4
+Event number is 118Block number is 61Pulse number is 4
+Event number is 159Block number is 87Pulse number is 4
+Event number is 160Block number is 61Pulse number is 4
+Event number is 218Block number is 54Pulse number is 4
+Event number is 227Block number is 18Pulse number is 4
+Event number is 241Block number is 61Pulse number is 4
+Event number is 267Block number is 87Pulse number is 4
+Event number is 327Block number is 18Pulse number is 4
+Event number is 491Block number is 60Pulse number is 4
+Event number is 502Block number is 61Pulse number is 4
+Event number is 545Block number is 18Pulse number is 4
+Event number is 554Block number is 18Pulse number is 4
+Event number is 578Block number is 87Pulse number is 4
+Event number is 598Block number is 99Pulse number is 4
+Event number is 605Block number is 18Pulse number is 4
+Event number is 646Block number is 89Pulse number is 4
+Event number is 672Block number is 52Pulse number is 4
+Event number is 673Block number is 61Pulse number is 4
+Event number is 692Block number is 58Pulse number is 4
+Event number is 724Block number is 58Pulse number is 4
+Event number is 731Block number is 87Pulse number is 4
+Event number is 846Block number is 58Pulse number is 4
+Event number is 919Block number is 52Pulse number is 4
+Event number is 931Block number is 87Pulse number is 4
+Event number is 965Block number is 87Pulse number is 4
+Event number is 970Block number is 27Pulse number is 4
+Event number is 990Block number is 18Pulse number is 4
+Event number is 1082Block number is 85Pulse number is 4
+Event number is 1107Block number is 196Pulse number is 4
+Event number is 1128Block number is 58Pulse number is 4
+Event number is 1130Block number is 61Pulse number is 4
+Event number is 1135Block number is 87Pulse number is 4
+Event number is 1230Block number is 101Pulse number is 4
+Event number is 1234Block number is 18Pulse number is 4
+Event number is 1291Block number is 61Pulse number is 4
+Event number is 1340Block number is 61Pulse number is 4
+Event number is 1358Block number is 61Pulse number is 4
+Event number is 1365Block number is 196Pulse number is 4
+Event number is 1431Block number is 196Pulse number is 4
+Event number is 1462Block number is 87Pulse number is 4
+Event number is 1486Block number is 60Pulse number is 4*/
