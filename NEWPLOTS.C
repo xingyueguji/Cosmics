@@ -148,41 +148,41 @@ void NEWPLOTS( Int_t nrun=55) {
     TCanvas *TimevsBlock = new TCanvas("TimevsBlock","",800,800);
     TimevsBlock->cd();
     TimeBlock->Draw("colz");
-    TimevsBlock->SaveAs(Form("Time_vs_Block_%i.pdf",nrun));
+    TimevsBlock->SaveAs(Form("../Time_vs_Block_%i.pdf",nrun));
 
     TimevsBlock->Clear();
     TimevsBlock->cd();
     TimeBlock_Zoom->Draw("colz");
-    TimevsBlock->SaveAs(Form("Time_vs_Block_Zoom_%i.pdf",nrun));
+    TimevsBlock->SaveAs(Form("../Time_vs_Block_Zoom_%i.pdf",nrun));
 
     TCanvas *TotHits = new TCanvas("TotHits","",800,800);
     TotHits->cd();
     TotalHit->Draw();
-    TotHits->SaveAs(Form("Total_Hits_%i.pdf",nrun));
+    TotHits->SaveAs(Form("../Total_Hits_%i.pdf",nrun));
 
     TotHits->Clear();
     TotHits->cd();
     TotalGoodHit->Draw();
-    TotHits->SaveAs(Form("Total_Good_Hits_%i.pdf",nrun));
+    TotHits->SaveAs(Form("../Total_Good_Hits_%i.pdf",nrun));
 
     TotHits->Clear();
     TotHits->cd();
     GoodHitPerBlock->Draw();
-    TotHits->SaveAs(Form("Total_Good_Hits_Per_Block_%i.pdf",nrun));
+    TotHits->SaveAs(Form("../Total_Good_Hits_Per_Block_%i.pdf",nrun));
 
     TCanvas *C_Amp = new TCanvas("Amp","",800,800);
     C_Amp->cd();
     AmpBlock->Draw("colz");
-    C_Amp->SaveAs(Form("Amp_VS_Block_%i.pdf",nrun));
+    C_Amp->SaveAs(Form("../Amp_VS_Block_%i.pdf",nrun));
 
     TCanvas *NumPulse = new TCanvas("NumPulse","#_of_Pulses_PMT_number",800,800);
     NumPulse->cd();
     PulseBlock->Draw("colz");
-    NumPulse->SaveAs(Form("#Pulse_vs_PMT_%i.pdf",nrun));
+    NumPulse->SaveAs(Form("../#Pulse_vs_PMT_%i.pdf",nrun));
     NumPulse->Clear();
     NumPulse->cd();
     GoodPulseBlock->Draw("colz");
-    NumPulse->SaveAs(Form("GOOD#Pulse_vs_PMT_%i.pdf",nrun));
+    NumPulse->SaveAs(Form("../GOOD#Pulse_vs_PMT_%i.pdf",nrun));
 
 }
 
