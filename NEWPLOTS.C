@@ -89,7 +89,7 @@ void NEWPLOTS( Int_t nrun=55) {
 
     //Get Waveform (see the comments below, only displaying 4 pulses event)
     t->GetEntry(2);
-    cout << SampWaveForm[4793] << SampWaveForm[4794] << endl;
+    cout << SampWaveForm[4792] <<" "<<  SampWaveForm[4793] << endl;
     for(Int_t i =0; i<NSampWaveForm; i++){
         if(Int_t(SampWaveForm[i]) == 47){
             if(Int_t(SampWaveForm[i+1]!= 100)){
