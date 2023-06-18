@@ -90,21 +90,21 @@ void NEWPLOTS( Int_t nrun=55) {
     //Get Waveform (see the comments below, only displaying 4 pulses event)
     t->GetEntry(731);
     for(Int_t i =0; i<NSampWaveForm; i++){
-        if(Int(SampWaveForm[i]) == 87){
-            if(Int(SampWaveForm[i+1]!= 100)){
+        if(Int_t(SampWaveForm[i]) == 87){
+            if(Int_t(SampWaveForm[i+1]!= 100)){
                 continue;
             }
         }
 
         for(Int_t j=0; j<100; j++){
-            f_SampWaveForm->SetBinContent[j+1,SampWaveForm[i+2+j]];
+            f_WaveForm->SetBinContent[j+1,SampWaveForm[i+2+j]];
         }
         break;
     }
 
     TCanvas *C_WaveForm = new TCanvas("C_WaveForm","Waveform",800,800);
     C_WaveForm->cd();
-    f_SampWaveForm->Draw();
+    f_WaveForm->Draw();
     C_WaveForm->SaveAs(Form("../Waveform_%i.pdf",nrun));
 
 
