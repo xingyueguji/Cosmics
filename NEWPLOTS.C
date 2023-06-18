@@ -97,7 +97,7 @@ void NEWPLOTS( Int_t nrun=55) {
         }
 
         for(Int_t j=0; j<100; j++){
-            f_WaveForm->SetBinContent[j+1,SampWaveForm[i+2+j]];
+            f_WaveForm->SetBinContent(j+1,SampWaveForm[i+2+j]);
         }
         break;
     }
