@@ -73,12 +73,12 @@ void NEWPLOTS( Int_t nrun=55) {
         }
         */
 
-       for(Int_t n=0; n<300; n++){
+       /*for(Int_t n=0; n<300; n++){
             if(GoodPulsenumber[n] == 2){
                 cout <<  "Event number is " << i << "Block number is " << n << "Good Pulse number is " << GoodPulsenumber[n] << endl; 
                 break;
             }
-        }
+        }*/
 
         for(Int_t k=0; k<120; k++){
         PulseBlock->Fill(k,Pulsenumber[k]);
@@ -238,4 +238,5 @@ Event number is 1486Block number is 60Pulse number is 4*/
 
 
 //GOOD PULSE NUMBER
+// NO 2 pulses event if apply strict timing cut
 
