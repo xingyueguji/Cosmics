@@ -56,7 +56,7 @@ void NEWPLOTS( Int_t nrun=55) {
             TimeBlock_Zoom->Fill(adcCounter[j]+1, Pulsetime[j]);
             AmpBlock->Fill(adcCounter[j]+1,Amp[j]);
             Pulsenumber[Int_t(adcCounter[j])] += 1;
-            if(Pulsetime[j]<= 130 or Pulsetime[j]>= 110){
+            if(Pulsetime[j]<= 130 and Pulsetime[j]>= 110){
                 counterofgoodhit += 1;
                 GoodHitPerBlock->Fill(adcCounter[j]+1);
                 GoodPulsenumber[Int_t(adcCounter[j])] += 1;
@@ -116,6 +116,7 @@ void NEWPLOTS( Int_t nrun=55) {
             if(Int_t(SampWaveForm[i+1]!= 100)){
                 continue;
             }
+            cout << SampWaveFormp[i] << " " << SampWaveForm[i+1] << endl;
             for(Int_t j=0; j<100; j++){
                 f_GoodWaveForm->SetBinContent(j+1,SampWaveForm[i+2+j]);
             }
@@ -133,8 +134,8 @@ void NEWPLOTS( Int_t nrun=55) {
     f_WaveForm->Draw();
     C_WaveForm->SaveAs(Form("../Waveform_%i.pdf",nrun));
 
-    C_Waveform->Clear();
-    C_Waveform->cd();
+    C_WaveForm->Clear();
+    C_WaveForm->cd();
     f_GoodWaveForm->Draw();
     C_WaveForm->SaveAs(Form("../GoodWaveForm_%i.pdf",nrun));
 
