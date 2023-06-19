@@ -33,12 +33,12 @@ void NEWPLOTS( Int_t nrun=536) {
     
     //Histogram------------------------------------------------------------------------
     TH1D *TotalHit = new TH1D("TotalHit","TotalHit_Above_4mV",100,0,100); // X = # of blocks
-    TH2D *TimeBlock = new TH2D("TimeBlock","Time_vs_Block",300,0,300,binnumber,0,binnumber * 4); // X = Block number, Y = Timing
+    TH2D *TimeBlock = new TH2D("TimeBlock","Time_vs_Block",1080,0,1080,binnumber,0,binnumber * 4); // X = Block number, Y = Timing
     TH1D *TotalGoodHit = new TH1D("TotalGoodHit","Good Hit",100,0,100); // X = # of blocks
     TH1D *GoodHitPerBlock = new TH1D("GoodHitPerBlock","GoodHitPerBlock",120,0,120); // X = # of blocks
-    TH2D *AmpBlock = new TH2D("AmpBlock","Amp_vs_Block",300,0,300,100,0,100); // X = Block number, Y = Amp
-    TH2D *PulseBlock = new TH2D("PulseBlock","#_of_Pulses_vs_PMT",300,0,300,10,0,10); // 300 can be changed to total pmt number, now using 300 to test it.
-    TH2D *GoodPulseBlock = new TH2D("GoodPulseBlock","#_of_GOOD_Pulses_vs_PMT",300,0,300,10,0,10); 
+    TH2D *AmpBlock = new TH2D("AmpBlock","Amp_vs_Block",1080,0,1080,100,0,100); // X = Block number, Y = Amp
+    TH2D *PulseBlock = new TH2D("PulseBlock","#_of_Pulses_vs_PMT",1080,0,1080,10,0,10); // 300 can be changed to total pmt number, now using 300 to test it.
+    TH2D *GoodPulseBlock = new TH2D("GoodPulseBlock","#_of_GOOD_Pulses_vs_PMT",1080,0,1080,10,0,10); 
     TH1D *f_WaveForm = new TH1D("f_WaveForm","Waveform_4P",binnumber,0,binnumber * 4);
     TH1D *f_GoodWaveForm = new TH1D("f_GoodWaveForm","GoodWaveform_2P",binnumber,0,binnumber * 4);
     cout << "abc" << endl;
@@ -58,7 +58,6 @@ void NEWPLOTS( Int_t nrun=536) {
         for(Int_t j=0; j<NadcCounter; j++){
             TimeBlock->Fill(adcCounter[j], Pulsetime[j]);
             AmpBlock->Fill(adcCounter[j],Amp[j]);
-            cout << Amp[j] << endl;
             Pulsenumber[Int_t(adcCounter[j])] += 1;
         }
         /*Test WaveForm
@@ -76,10 +75,10 @@ void NEWPLOTS( Int_t nrun=536) {
                 break;
             }
         }*/
-        for(Int_t k=0; k<300; k++){
+        for(Int_t k=0; k<1080; k++){
         PulseBlock->Fill(k,Pulsenumber[k]);
         }
-        for(Int_t z=0;z<300;z++){
+        for(Int_t z=0;z<1080;z++){
             Pulsenumber[z] = 0;
         }
     }
@@ -131,42 +130,42 @@ void NEWPLOTS( Int_t nrun=536) {
 
     TimeBlock->FitSlicesX(nullptr,0,-1,0,"QNR");
     TH1D *f_ZoomMean = (TH1D*)gDirectory->Get("TimeBlock_1");
-    Double_t TimeMean[300] = {};
+    Double_t TimeMean[1080] = {};
     f_ZoomMean->Draw();
-    for(Int_t i=0;i<300;i++){
+    for(Int_t i=0;i<1080;i++){
         TimeMean[i] = f_ZoomMean->GetBinContent(i+1);
     }
     Double_t Sum = 0;
     Double_t nBINs = 0;
-    for(Int_t i=0;i<300;i++){
-        if(TimeMean[i]!=0){
+    for(Int_t i=0;i<1080;i++){
+        if(TimeMean[i]!=0 and TimeMean[i] < binnumber * 4 and TimeMean[i] > 0){
             Sum+=TimeMean[i];
             nBINs += 1;
         }
     }
     Sum = Sum / nBINs;
     TH2D *TimeBlock_Zoom = new TH2D(*TimeBlock); // X = Block number, Y = zoom in Timing
-    TimeBlock_Zoom->GetYaxis()->SetRangeUser(100,130);// FIXME: change range
+    TimeBlock_Zoom->GetYaxis()->SetRangeUser(Sum - 40,Sum + 40);// FIXME: change range
 
 
     for(Int_t i=0; i<nentries; i++){
         t->GetEntry(i);
         for(Int_t j=0; j<NadcCounter; j++){
-            if(Pulsetime[j]<= 130 and Pulsetime[j]>= 110){ // FIXME: change range
+            if(Pulsetime[j]<= Sum + 40 and Pulsetime[j]>= Sum - 40){ // FIXME: change range
                 counterofgoodhit += 1;
                 GoodHitPerBlock->Fill(adcCounter[j]);
                 GoodPulsenumber[Int_t(adcCounter[j])] += 1;
             }
         }
 
-        for(Int_t k=0; k<300; k++){
+        for(Int_t k=0; k<1080; k++){
         GoodPulseBlock->Fill(k,GoodPulsenumber[k]);
         }
 
         TotalGoodHit->Fill(counterofgoodhit);
 
         counterofgoodhit = 0;
-        for(Int_t z=0;z<300;z++){
+        for(Int_t z=0;z<1080;z++){
             GoodPulsenumber[z] = 0;
         }
     }    
