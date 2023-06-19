@@ -1,6 +1,6 @@
 #include <cmath>
 
-void NEWPLOTS( Int_t nrun=55) {
+void NEWPLOTS( Int_t nrun=536) {
     // if full replay : fullreplay = 1;
     // if single event: nevent = event number, replay = 1, fullreplay != 1;
     // if 20k replay: replay = 20k, fullreplay != 1;
@@ -9,6 +9,7 @@ void NEWPLOTS( Int_t nrun=55) {
     
     TFile *f = new TFile(Form("../nps_eel108_%d.root", nrun));
     TTree *t = (TTree*) f->Get("T");
+
     
     // Branch declaration -------------------------------------------------------------
     
@@ -24,23 +25,27 @@ void NEWPLOTS( Int_t nrun=55) {
     t->SetBranchAddress("NPS.cal.fly.adcSampPulseTime",&Pulsetime);
     Double_t Amp[2000];
     t->SetBranchAddress("NPS.cal.fly.adcSampPulseAmp",&Amp);
+
+    // Get some useful variables-------------------------------------------------------
+
+    t->GetEntry(1);
+    Int_t binnumber = SampWaveForm[1];
     
     //Histogram------------------------------------------------------------------------
-    TH1D *TotalHit = new TH1D("TotalHit","TotalHit_Above_4mV",100,0,100);
-    TH2D *TimeBlock = new TH2D("TimeBlock","Time_vs_Block",120,0,120,100,0,400);
-    TH2D *TimeBlock_Zoom = new TH2D("TimeBlock_Zoom","Time_vs_Block",120,0,120,10,100,140);
-    TH1D *TotalGoodHit = new TH1D("TotalGoodHit","Good Hit",100,0,100);
-    TH1D *GoodHitPerBlock = new TH1D("GoodHitPerBlock","GoodHitPerBlock",120,0,120);
-    TH2D *AmpBlock = new TH2D("AmpBlock","Amp_vs_Block",120,0,120,30,0,30);
+    TH1D *TotalHit = new TH1D("TotalHit","TotalHit_Above_4mV",100,0,100); // X = # of blocks
+    TH2D *TimeBlock = new TH2D("TimeBlock","Time_vs_Block",300,0,300,binnumber,0,binnumber * 4); // X = Block number, Y = Timing
+    TH1D *TotalGoodHit = new TH1D("TotalGoodHit","Good Hit",100,0,100); // X = # of blocks
+    TH1D *GoodHitPerBlock = new TH1D("GoodHitPerBlock","GoodHitPerBlock",120,0,120); // X = # of blocks
+    TH2D *AmpBlock = new TH2D("AmpBlock","Amp_vs_Block",300,0,300,100,0,100); // X = Block number, Y = Amp
     TH2D *PulseBlock = new TH2D("PulseBlock","#_of_Pulses_vs_PMT",300,0,300,10,0,10); // 300 can be changed to total pmt number, now using 300 to test it.
-    TH2D *GoodPulseBlock = new TH2D("GoodPulseBlock","#_of_GOOD_Pulses_vs_PMT",300,0,300,10,0,10);
-    TH1D *f_WaveForm = new TH1D("f_WaveForm","Waveform_4P",100,0,400);
-    TH1D *f_GoodWaveForm = new TH1D("f_GoodWaveForm","GoodWaveform_2P",100,0,400);
+    TH2D *GoodPulseBlock = new TH2D("GoodPulseBlock","#_of_GOOD_Pulses_vs_PMT",300,0,300,10,0,10); 
+    TH1D *f_WaveForm = new TH1D("f_WaveForm","Waveform_4P",binnumber,0,binnumber * 4);
+    TH1D *f_GoodWaveForm = new TH1D("f_GoodWaveForm","GoodWaveform_2P",binnumber,0,binnumber * 4);
     cout << "abc" << endl;
 
     //Arrays
-    Int_t Pulsenumber[300] = {}; // can change 120 to 36*30
-    Int_t GoodPulsenumber[300] = {};
+    Int_t Pulsenumber[2000] = {}; // can change 120 to 36*30
+    Int_t GoodPulsenumber[2000] = {};
 
     //Filling Histogram
     Long64_t nentries = t->GetEntries();
@@ -50,20 +55,12 @@ void NEWPLOTS( Int_t nrun=55) {
     for(Int_t i=0; i<nentries; i++){
         t->GetEntry(i);
         TotalHit->Fill(NadcCounter); 
-
         for(Int_t j=0; j<NadcCounter; j++){
             TimeBlock->Fill(adcCounter[j], Pulsetime[j]);
-            TimeBlock_Zoom->Fill(adcCounter[j], Pulsetime[j]);
             AmpBlock->Fill(adcCounter[j],Amp[j]);
+            cout << Amp[j] << endl;
             Pulsenumber[Int_t(adcCounter[j])] += 1;
-            if(Pulsetime[j]<= 130 and Pulsetime[j]>= 110){
-                counterofgoodhit += 1;
-                GoodHitPerBlock->Fill(adcCounter[j]);
-                GoodPulsenumber[Int_t(adcCounter[j])] += 1;
-            }
         }
-
-
         /*Test WaveForm
         for(Int_t n=0; n<300; n++){
             if(Pulsenumber[n] == 4){
@@ -79,25 +76,16 @@ void NEWPLOTS( Int_t nrun=55) {
                 break;
             }
         }*/
-
-        for(Int_t k=0; k<120; k++){
+        for(Int_t k=0; k<300; k++){
         PulseBlock->Fill(k,Pulsenumber[k]);
-        GoodPulseBlock->Fill(k,GoodPulsenumber[k]);
         }
-
-        TotalGoodHit->Fill(counterofgoodhit);
-
-
-        counterofgoodhit = 0;
         for(Int_t z=0;z<300;z++){
             Pulsenumber[z] = 0;
-            GoodPulsenumber[z] = 0;
         }
     }
 
     //Get Waveform (see the comments below, only displaying 4 pulses event)
-    t->GetEntry(2);
-    //cout << SampWaveForm[4692] <<" "<<  SampWaveForm[4693] << endl;
+    /*t->GetEntry(2);
     for(Int_t i =0; i<NSampWaveForm; i++){
         if(Int_t(SampWaveForm[i]) == 47){
             if(Int_t(SampWaveForm[i+1]!= 100)){
@@ -106,10 +94,9 @@ void NEWPLOTS( Int_t nrun=55) {
             for(Int_t j=0; j<100; j++){
                 f_WaveForm->SetBinContent(j+1,SampWaveForm[i+2+j]);
             }
-            //cout << i << endl;
             break;
         }
-    }
+    }*/
     /*t->GetEntry(1);
     for(Int_t i =0; i<NSampWaveForm; i++){
         if(Int_t(SampWaveForm[i]) == 196){
@@ -129,60 +116,101 @@ void NEWPLOTS( Int_t nrun=55) {
 
 
 
-    TCanvas *C_WaveForm = new TCanvas("C_WaveForm","Waveform",800,800);
+    /*TCanvas *C_WaveForm = new TCanvas("C_WaveForm","Waveform",800,800);
     C_WaveForm->cd();
     f_WaveForm->Draw();
-    C_WaveForm->SaveAs(Form("../Waveform_%i.pdf",nrun));
+    C_WaveForm->SaveAs(Form("../NewPlots/Waveform_%i.pdf",nrun));
 
     C_WaveForm->Clear();
     C_WaveForm->cd();
     f_GoodWaveForm->Draw();
-    C_WaveForm->SaveAs(Form("../GoodWaveForm_%i.pdf",nrun));
+    C_WaveForm->SaveAs(Form("../NewPlots/GoodWaveForm_%i.pdf",nrun));*/
 
 
+    // Get the mean and change zoom in region ------------
 
-    
+    TimeBlock->FitSlicesX(nullptr,0,-1,0,"QNR");
+    TH1D *f_ZoomMean = (TH1D*)gDirectory->Get("TimeBlock_1");
+    Double_t TimeMean[300] = {};
+    f_ZoomMean->Draw();
+    for(Int_t i=0;i<300;i++){
+        TimeMean[i] = f_ZoomMean->GetBinContent(i+1);
+    }
+    Double_t Sum = 0;
+    Double_t nBINs = 0;
+    for(Int_t i=0;i<300;i++){
+        if(TimeMean[i]!=0){
+            Sum+=TimeMean[i];
+            nBINs += 1;
+        }
+    }
+    Sum = Sum / nBINs;
+    TH2D *TimeBlock_Zoom = new TH2D(*TimeBlock); // X = Block number, Y = zoom in Timing
+    TimeBlock_Zoom->GetYaxis()->SetRangeUser(100,130);// FIXME: change range
+
+
+    for(Int_t i=0; i<nentries; i++){
+        t->GetEntry(i);
+        for(Int_t j=0; j<NadcCounter; j++){
+            if(Pulsetime[j]<= 130 and Pulsetime[j]>= 110){ // FIXME: change range
+                counterofgoodhit += 1;
+                GoodHitPerBlock->Fill(adcCounter[j]);
+                GoodPulsenumber[Int_t(adcCounter[j])] += 1;
+            }
+        }
+
+        for(Int_t k=0; k<300; k++){
+        GoodPulseBlock->Fill(k,GoodPulsenumber[k]);
+        }
+
+        TotalGoodHit->Fill(counterofgoodhit);
+
+        counterofgoodhit = 0;
+        for(Int_t z=0;z<300;z++){
+            GoodPulsenumber[z] = 0;
+        }
+    }    
 
     //Draw
 
     TCanvas *TimevsBlock = new TCanvas("TimevsBlock","",800,800);
     TimevsBlock->cd();
     TimeBlock->Draw("colz");
-    TimevsBlock->SaveAs(Form("../Time_vs_Block_%i.pdf",nrun));
+    TimevsBlock->SaveAs(Form("../NewPlots/Time_vs_Block_%i.pdf",nrun));
 
     TimevsBlock->Clear();
     TimevsBlock->cd();
     TimeBlock_Zoom->Draw("colz");
-    TimevsBlock->SaveAs(Form("../Time_vs_Block_Zoom_%i.pdf",nrun));
+    TimevsBlock->SaveAs(Form("../NewPlots/Time_vs_Block_Zoom_%i.pdf",nrun));
 
     TCanvas *TotHits = new TCanvas("TotHits","",800,800);
     TotHits->cd();
     TotalHit->Draw();
-    TotHits->SaveAs(Form("../Total_Hits_%i.pdf",nrun));
+    TotHits->SaveAs(Form("../NewPlots/Total_Hits_%i.pdf",nrun));
 
     TotHits->Clear();
     TotHits->cd();
     TotalGoodHit->Draw();
-    TotHits->SaveAs(Form("../Total_Good_Hits_%i.pdf",nrun));
+    TotHits->SaveAs(Form("../NewPlots/Total_Good_Hits_%i.pdf",nrun));
 
     TotHits->Clear();
     TotHits->cd();
     GoodHitPerBlock->Draw();
-    TotHits->SaveAs(Form("../Total_Good_Hits_Per_Block_%i.pdf",nrun));
+    TotHits->SaveAs(Form("../NewPlots/Total_Good_Hits_Per_Block_%i.pdf",nrun));
 
     TCanvas *C_Amp = new TCanvas("Amp","",800,800);
     C_Amp->cd();
     AmpBlock->Draw("colz");
-    C_Amp->SaveAs(Form("../Amp_VS_Block_%i.pdf",nrun));
+    C_Amp->SaveAs(Form("../NewPlots/Amp_VS_Block_%i.pdf",nrun));
 
     TCanvas *NumPulse = new TCanvas("NumPulse","#_of_Pulses_PMT_number",800,800);
     NumPulse->cd();
     PulseBlock->Draw("colz");
-    NumPulse->SaveAs(Form("../#Pulse_vs_PMT_%i.pdf",nrun));
+    NumPulse->SaveAs(Form("../NewPlots/#Pulse_vs_PMT_%i.pdf",nrun));
     NumPulse->Clear();
     NumPulse->cd();
     GoodPulseBlock->Draw("colz");
-    NumPulse->SaveAs(Form("../GOOD#Pulse_vs_PMT_%i.pdf",nrun));
+    NumPulse->SaveAs(Form("../NewPlots/GOOD#Pulse_vs_PMT_%i.pdf",nrun));
 
 }
 
