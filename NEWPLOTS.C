@@ -35,7 +35,7 @@ void NEWPLOTS( Int_t nrun=536) {
     TH1D *TotalHit = new TH1D("TotalHit","TotalHit_Above_4mV",100,0,100); // X = # of blocks
     TH2D *TimeBlock = new TH2D("TimeBlock","Time_vs_Block",1080,0,1080,binnumber,0,binnumber * 4); // X = Block number, Y = Timing
     TH1D *TotalGoodHit = new TH1D("TotalGoodHit","Good Hit",100,0,100); // X = # of blocks
-    TH1D *GoodHitPerBlock = new TH1D("GoodHitPerBlock","GoodHitPerBlock",120,0,120); // X = # of blocks
+    TH1D *GoodHitPerBlock = new TH1D("GoodHitPerBlock","GoodHitPerBlock",1080,0,1080); // X = Block number
     TH2D *AmpBlock = new TH2D("AmpBlock","Amp_vs_Block",1080,0,1080,100,0,100); // X = Block number, Y = Amp
     TH2D *PulseBlock = new TH2D("PulseBlock","#_of_Pulses_vs_PMT",1080,0,1080,10,0,10); // 300 can be changed to total pmt number, now using 300 to test it.
     TH2D *GoodPulseBlock = new TH2D("GoodPulseBlock","#_of_GOOD_Pulses_vs_PMT",1080,0,1080,10,0,10); 
@@ -54,7 +54,9 @@ void NEWPLOTS( Int_t nrun=536) {
     cout <<"Total Event Number is "<< nentries << endl;
     for(Int_t i=0; i<nentries; i++){
         t->GetEntry(i);
-        TotalHit->Fill(NadcCounter); 
+        if(NadcCounter!=0){
+            TotalHit->Fill(NadcCounter); 
+        }
         for(Int_t j=0; j<NadcCounter; j++){
             TimeBlock->Fill(adcCounter[j], Pulsetime[j]);
             AmpBlock->Fill(adcCounter[j],Amp[j]);
@@ -161,9 +163,9 @@ void NEWPLOTS( Int_t nrun=536) {
         for(Int_t k=0; k<1080; k++){
         GoodPulseBlock->Fill(k,GoodPulsenumber[k]);
         }
-
-        TotalGoodHit->Fill(counterofgoodhit);
-
+        if(counterofgoodhit !=0){
+            TotalGoodHit->Fill(counterofgoodhit);
+        }
         counterofgoodhit = 0;
         for(Int_t z=0;z<1080;z++){
             GoodPulsenumber[z] = 0;
