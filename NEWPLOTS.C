@@ -41,7 +41,6 @@ void NEWPLOTS( Int_t nrun=536) {
     TH2D *GoodPulseBlock = new TH2D("GoodPulseBlock","#_of_GOOD_Pulses_vs_PMT",1080,0,1080,10,0,10); 
     TH1D *f_WaveForm = new TH1D("f_WaveForm","Waveform_4P",binnumber,0,binnumber * 4);
     TH1D *f_GoodWaveForm = new TH1D("f_GoodWaveForm","GoodWaveform_2P",binnumber,0,binnumber * 4);
-    cout << "abc" << endl;
 
     //Arrays
     Int_t Pulsenumber[2000] = {}; // can change 120 to 36*30
@@ -130,7 +129,7 @@ void NEWPLOTS( Int_t nrun=536) {
 
     // Get the mean and change zoom in region ------------
 
-    TimeBlock->FitSlicesX(nullptr,0,-1,0,"QNR");
+    TimeBlock->FitSlicesY(nullptr,0,-1,0,"QNR");
     TH1D *f_ZoomMean = (TH1D*)gDirectory->Get("TimeBlock_1");
     Double_t TimeMean[1080] = {};
     f_ZoomMean->Draw();
@@ -146,6 +145,7 @@ void NEWPLOTS( Int_t nrun=536) {
         }
     }
     Sum = Sum / nBINs;
+    cout << Sum << endl;
     TH2D *TimeBlock_Zoom = new TH2D(*TimeBlock); // X = Block number, Y = zoom in Timing
     TimeBlock_Zoom->GetYaxis()->SetRangeUser(Sum - 40,Sum + 40);// FIXME: change range
 
