@@ -1,6 +1,6 @@
 #include <cmath>
 
-void cosmics( Int_t nrun=1355, Int_t nevent=20, Int_t replay = 1, Int_t fullreplay = 1) {
+void cosmics( Int_t nrun=1370, Int_t nevent=1, Int_t replay = 1, Int_t fullreplay = -1) {
     // if full replay : fullreplay = 1;
     // if single event: nevent = event number, replay = 1, fullreplay != 1;
     // if 20k replay: replay = 20k, fullreplay != 1;
@@ -17,7 +17,7 @@ void cosmics( Int_t nrun=1355, Int_t nevent=20, Int_t replay = 1, Int_t fullrepl
     gStyle->SetOptFit(3);
     // --------------------------------------------------------------------------------
     
-    TFile *f = new TFile(Form("nps_eel108_%d.root", nrun));
+    TFile *f = new TFile(Form("~/nps_eel108_%d.root", nrun));
     TTree *t = (TTree*) f->Get("T");
     
     
@@ -39,10 +39,16 @@ void cosmics( Int_t nrun=1355, Int_t nevent=20, Int_t replay = 1, Int_t fullrepl
     t->SetBranchAddress("NPS.cal.fly.adcSampPed",&Ped);
     Double_t Pulsetime[2000];
     t->SetBranchAddress("NPS.cal.fly.adcSampPulseTime",&Pulsetime);
+    Int_t N_block_clusterID;
+    t->SetBranchAddress("Ndata.NPS.cal.fly.block_clusterID",&N_block_clusterID);
+    Double_t block_clusterID[2000];
+    t->SetBranchAddress("NPS.cal.fly.block_clusterID",&block_clusterID);
+    Double_t nclust;
+    t->SetBranchAddress("NPS.cal.fly.nclust",&nclust);
     //Histogram------------------------------------------------------------------------
     
     TH2F *mapping = new TH2F("mapping","NPS",30,0,30,36,0,36);
-    TH1F *Waveform = new TH1F("Waveform","",82,0,82*4);
+    TH1F *Waveform = new TH1F("Waveform","",120,0,120*4);
     
     TH2F *mappingAmp = new TH2F("mappingAmp","Amp Mean",30,0,30,36,0,36);
     TH2F *mappingInt = new TH2F("mappingInt","Integral Mean",30,0,30,36,0,36);
@@ -58,17 +64,21 @@ void cosmics( Int_t nrun=1355, Int_t nevent=20, Int_t replay = 1, Int_t fullrepl
     TCanvas *Intsingleplot = new TCanvas("Intsingleplot","",3200,3200);
     TCanvas *Pedsingleplot = new TCanvas("Pedsingleplot","",3200,3200);
     TCanvas *Pulsetimesingleplot = new TCanvas("Pulsetimesingleplot","",3200,3200);
+
+    TCanvas *c_WaveForm = new TCanvas("WaveForm","",800,800);
     
     TH1F *h_SingleBlockAmp[1080];
     TH1F *h_SingleBlockInt[1080];
     TH1F *h_SingleBlockTime[1080];
     TH1F *h_SingleBlockPed[1080];
+    TH1F *h_SingleBlockWaveForm[1080];
     
     for (int n = 0; n < 1080; n++){
-        h_SingleBlockAmp[n] = new TH1F(Form("h_SingleBlockAmp_%d",n),"",50,0,50);
-        h_SingleBlockInt[n] = new TH1F(Form("h_SingleBlockInt_%d",n),"",50,0,20);//range to be determined
-        h_SingleBlockTime[n] = new TH1F(Form("h_SingleBlockTime_%d",n),"",50,0,250);
+        h_SingleBlockAmp[n] = new TH1F(Form("h_SingleBlockAmp_%d",n),"",100,0,100);
+        h_SingleBlockInt[n] = new TH1F(Form("h_SingleBlockInt_%d",n),"",100,0,100);//range to be determined
+        h_SingleBlockTime[n] = new TH1F(Form("h_SingleBlockTime_%d",n),"",100,0,400);
         h_SingleBlockPed[n] = new TH1F(Form("h_SingleBlockPed_%d",n),"",50,0,120);
+        h_SingleBlockWaveForm[n] = new TH1F(Form("h_SingleBlockWaveForm_%d",n),"",120,0,120*4);
     }
     
     
@@ -114,6 +124,16 @@ void cosmics( Int_t nrun=1355, Int_t nevent=20, Int_t replay = 1, Int_t fullrepl
             h_SingleBlockInt[counter]->Fill(Int[a]);
             h_SingleBlockTime[counter]->Fill(Pulsetime[a]);
             h_SingleBlockPed[counter]->Fill(Ped[a]);
+            for (Int_t b=0; b < NSampWaveForm; b++){
+                if (int (SampWaveForm[b]) == counter && int(SampWaveForm[b+1]) == 120){
+                    if (h_SingleBlockWaveForm[counter]->GetEntries() == 0){
+                        for (Int_t c=0; c<120; c++){
+                            h_SingleBlockWaveForm[counter]->SetBinContent(c+1, SampWaveForm[b+2+c]);
+                            cout << "Event " << nevent << "Bin content is " << SampWaveForm[b+2+c] << " Block number is " << counter << endl;
+                        }
+                    }
+                }
+            }
         }
     }
     else{
@@ -228,7 +248,7 @@ void cosmics( Int_t nrun=1355, Int_t nevent=20, Int_t replay = 1, Int_t fullrepl
     }
     
     
-    for (int i=1; i<271; i++){
+    /*for (int i=1; i<271; i++){
         Ampsingleplot->Clear();
         Ampsingleplot->Divide(2,2);
         for (int j=1; j<5; j++){
@@ -265,7 +285,7 @@ void cosmics( Int_t nrun=1355, Int_t nevent=20, Int_t replay = 1, Int_t fullrepl
             h_SingleBlockTime[(i-1)*4 + j - 1]->Draw();
         }
         Pulsetimesingleplot->SaveAs(Form("~/NPS/singleblocktime/canvas_%d.pdf",i));
-    }
+    }*/
     
     
     
@@ -308,6 +328,23 @@ void cosmics( Int_t nrun=1355, Int_t nevent=20, Int_t replay = 1, Int_t fullrepl
     mappingPulsetime->SetMarkerColor(kBlack);
     mappingPulsetime->Draw("colztext");
     Pulsetimemean->SaveAs(Form("~/NPS/Timemapping_run_%d_fullreplay_%d.pdf",nrun,fullreplay));
+
+    if(replay == 1 && fullreplay != 1){
+        t->GetEntry(nevent);
+        for (Int_t b=0; b<N_block_clusterID; b++){
+            if(int(block_clusterID[b]) != -1){
+                cout << "block_clusterID is " << block_clusterID[b] << " And Block Number is "<< b << " Total # of cluster is "<< nclust<< endl;
+            }
+        }
+
+        for (Int_t a=0; a<NadcCounter; a++){
+            counter = int(adcCounter[a]);
+            c_WaveForm->cd();
+            h_SingleBlockWaveForm[counter]->Draw();
+            c_WaveForm->SaveAs(Form("~/NPS/WaveForm/SingleblockWaveForm_run_%d_block_%d_event_%d.pdf",nrun,counter,nevent));
+            c_WaveForm->Clear();
+        }
+    }
     
     
 }
